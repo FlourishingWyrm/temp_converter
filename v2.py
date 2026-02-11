@@ -23,32 +23,40 @@ class Converter():
                                   text = "Temperature converter",
                                   font=("arial", 16, "bold"),
                                   )
+
         self.temp_heading.grid(row=0)
+        # headddding
         instructions = ("please enter a temperature below "
                         "then choose the unit to convert to by selecting the corresponding button")
         self.temp_instructions = Label(self.temp_frame,
                                        text = instructions,
                                        wraplength=250, width=40,
                                        justify="left")
+
         self.temp_instructions.grid(row=1)
         self.temp_entry = Entry(self.temp_frame,
                                 font=("arial", 14))
+        # instructions
         self.temp_entry.grid(row=2, padx=10, pady=10)
 
         error = "Please enter a valid temperature"
         self.answer_error = Label(self.temp_frame, text = error, fg="#004C99",
                                   font=("Arial", 14, "bold"))
         self.answer_error.grid(row=3)
+        # error messages
         self.button_frame = Frame(self.temp_frame)
         self.button_frame.grid(row=4)
+        # button set up
         buttons = [
             ["To celcus", "#990099",lambda: self.check_temp(c.ABS_ZERO_CELSIUS),0,0],
             ["to Farenheight","#009900",lambda: self.check_temp(c.ABS_ZER0_FAHRENHEIT),0,1],
             ["Help/info","#CC6600","",1,0],
             ["History/Export","#004C99","",1,1]
         ]
+        # button attributes
         self.button_ref_list = []
         for item in buttons:
+        # creates the buttons
             self.make_button = Button(self.button_frame,
                                       text=item[0], bg=item[1],
                                       fg="#FFFFFF",font=("Arial", 12, "bold"),
@@ -61,6 +69,7 @@ class Converter():
         """checks if the temperature is valid and converts it to the selected unit"""
         try:
             to_convert = float(self.temp_entry.get().strip(["°F","°C"][[-459,-273].index(min_temp)]))
+            # makes the input a float and strips the unit
             if (to_convert >= min_temp):
                 error = ""
                 valid = True
@@ -75,6 +84,7 @@ class Converter():
         if valid == True:
             self.temp_entry.delete(0, END)
             self.answer_error.config(text=str(round([(to_convert* 9/5) + 32,(to_convert - 32) * 5/9][[-273,-459].index(min_temp)]+0.1)),font=("Arial", 18, "bold"))
+            # if else statement in one line (to be cleaned up before final submission dues to inneficency)
 
 # [(to_convert× 9/5) + 32,(to_convert − 32) × 5/9]
 #main code
