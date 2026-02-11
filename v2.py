@@ -8,14 +8,45 @@
 # history and export page last 5 calculations
 
 #return (user_input - 32) * 5 / 9 (celcus)
+
+# ///////////////////////////////////////          IMPORTANT : make a percent file to store the memory cause i can ///////////////////////////////////////////////////////
 from tkinter import *
 import all_constants as c
+import os
 import time
+history_storage = []
+if not os.path.exists("{}.txt".format("data")):
+    text_file = open("{}.txt".format("data"), "w+")
+    history_storage = [""] * 5
+else:
+    text_file = open("{}.txt".format("data"), "r")
+    data = text_file.read()
+    data = data.translate("")
+    ticker = 0
+    tempword = ""
+    current_item_index = 0
+    # runs until the intended end of the file
+    while not data[ticker] == "=":
+        # breaks up each item
+        if data[ticker] == "," and not data[ticker] == "=":
+            ticker += 1
+            # runs untill the next break
+            while not data[ticker] == "," and not data[ticker] == "=":
+                # ignores the quotes
+                if not data[ticker] == "'":
+                    # adds the char to the temp word
+                    tempword = tempword + data[ticker]
+                ticker += 1
+            history_storage.append(tempword)
+            tempword = ""
+print(history_storage)
 class Converter():
     """conversion tool"""
+    global history_storage
 
     def __init__(self):
         """gui"""
+
         self.temp_frame = Frame(padx=10 , pady=10)
         self.temp_frame.grid(row=0, column=0)
 
@@ -51,7 +82,7 @@ class Converter():
             ["To celcus", "#990099",lambda: self.check_temp(c.ABS_ZERO_CELSIUS),0,0],
             ["to Farenheight","#009900",lambda: self.check_temp(c.ABS_ZER0_FAHRENHEIT),0,1],
             ["Help/info","#CC6600","",1,0],
-            ["History/Export","#004C99","",1,1]
+            ["History/Export","#004C99",lambda: self.history_goto(),1,1]
         ]
         # button attributes
         self.button_ref_list = []
@@ -64,11 +95,12 @@ class Converter():
             self.make_button.grid(row=item[3], column=item[4], padx=5, pady=5)
 
             self.button_ref_list.append(self.make_button)
-        self.to_history_button = self.button_ref_list[3].config(state=DISABLED)
+        self.to_history_button = self.button_ref_list[3]
     def check_temp(self, min_temp,valid=False):
         """checks if the temperature is valid and converts it to the selected unit"""
+        unit = ["°F","°C"][[-459,-273].index(min_temp)]
         try:
-            to_convert = float(self.temp_entry.get().strip(["°F","°C"][[-459,-273].index(min_temp)]))
+            to_convert = round(float(self.temp_entry.get().strip(unit)))
             # makes the input a float and strips the unit
             if (to_convert >= min_temp):
                 error = ""
@@ -82,9 +114,75 @@ class Converter():
             self.temp_entry.config(bg="#F4CCCC")
             # self.temp_entry.focus_set()
         if valid == True:
+            self.answer_error.config(fg="#004C99")
+            self.temp_entry.config(bg="#FFFFFF")
             self.temp_entry.delete(0, END)
-            self.answer_error.config(text=str(round([(to_convert* 9/5) + 32,(to_convert - 32) * 5/9][[-273,-459].index(min_temp)]+0.1)),font=("Arial", 18, "bold"))
+            output = str(to_convert)+unit+" → "+str(round([(to_convert* 9/5) + 32,(to_convert - 32) * 5/9][[-273,-459].index(min_temp)]+0.1))+["°F","°C"][[-273,-459].index(min_temp)]
+            self.answer_error.config(text=output,font=("Arial", 18, "bold"))
+            history_storage.pop(-1)
+            history_storage.insert(0,output)
+            text = str(history_storage)
+            text = text.strip("[]")
+            text = "," + text + "="
+            open("data.txt", "w+").write(text)
+
+
+
             # if else statement in one line (to be cleaned up before final submission dues to inneficency)
+            # rounding is fixed through the +0.1
+    def history_goto(self):
+        self.temp_frame.destroy()
+        history()
+class history():
+    """calculation history"""
+    global history_storage
+    print(history_storage)
+    def __init__(self):
+        history_text = ""
+        for item in history_storage:
+            history_text += item + f"\n"
+        self.temp_frame = Frame(padx=10, pady=10)
+        self.temp_frame.grid(row=0, column=0)
+
+        self.temp_heading = Label(self.temp_frame,
+                                  text="Converter history",
+                                  font=("arial", 16, "bold"),
+                                  )
+
+        self.temp_heading.grid(row=0)
+        # headddding
+        instructions = ("displays the history of the calculator")
+        self.temp_instructions = Label(self.temp_frame,
+                                       text=instructions,
+                                       wraplength=250, width=40,
+                                       justify="left")
+
+        self.temp_instructions.grid(row=1)
+        self.history_entry = Label(self.temp_frame,
+                                   text=history_text,
+                                   font=("arial", 10))
+        self.history_entry.grid(row=2, padx=10, pady=10)
+        self.button_frame = Frame(self.temp_frame)
+        self.button_frame.grid(row=4)
+        buttons = [
+            ["Back", "#990099", lambda: Converter(), 0, 0],
+            ["Export to file", "#009900", lambda: self.export(history_text), 0, 1],
+        ]
+        self.button_ref_list = []
+        for item in buttons:
+            # creates the buttons
+            self.make_button = Button(self.button_frame,
+                                      text=item[0], bg=item[1],
+                                      fg="#FFFFFF", font=("Arial", 12, "bold"),
+                                      width=12, command=item[2])
+            self.make_button.grid(row=item[3], column=item[4], padx=5, pady=5)
+
+            self.button_ref_list.append(self.make_button)
+    def export(self,history_text):
+        exported = open(os.path.join(os.path.expanduser("~"), "Desktop", f"{time.time()}.txt"),'w')
+        exported.write(f"Converter history\n{history_text}")
+
+
 
 # [(to_convert× 9/5) + 32,(to_convert − 32) × 5/9]
 #main code
