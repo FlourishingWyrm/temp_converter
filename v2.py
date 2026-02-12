@@ -164,7 +164,7 @@ class history():
             if ticker <= 5:
                 history_print = history_text
             ticker += 1
-        self.temp_frame = Frame(padx=10, pady=10,background=["#FFFFFF","","","","","#CC6600","#8B0000"][min(len(history_storage),5)],)
+        self.temp_frame = Frame(padx=10, pady=10,background=["#FFFFFF","","","","","#CC6600","#8B0000"][min(len(history_storage),6)],)
         self.temp_frame.grid(row=0, column=0,)
 
         self.temp_heading = Label(self.temp_frame,
