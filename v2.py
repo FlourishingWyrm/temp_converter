@@ -164,8 +164,8 @@ class history():
             if ticker <= 5:
                 history_print = history_text
             ticker += 1
-        self.temp_frame = Frame(padx=10, pady=10)
-        self.temp_frame.grid(row=0, column=0)
+        self.temp_frame = Frame(padx=10, pady=10,background=["#FFFFFF","","","","","#CC6600","#8B0000"][min(len(history_storage),5)],)
+        self.temp_frame.grid(row=0, column=0,)
 
         self.temp_heading = Label(self.temp_frame,
                                   text="Converter history",
@@ -184,7 +184,8 @@ class history():
         self.temp_instructions.grid(row=1)
         self.history_entry = Label(self.temp_frame,
                                    text=history_text,
-                                   font=("arial", 10))
+                                   font=("arial", 10),
+                                   )
         self.history_entry.grid(row=2, padx=10, pady=10)
         self.button_frame = Frame(self.temp_frame)
         self.button_frame.grid(row=4)
